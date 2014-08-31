@@ -19,7 +19,7 @@ public class Ex_1_3 {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        String[] dirs = new String[]{"/Users/bluewind/java8_exercises/ex_1_3"};
+        String[] dirs = new String[]{"/Users/bluewind/java8_exercises/ex_1_3", "/Users/bluewind/java8_exercises/ex_1_2"};
         
         for(String dir : dirs){
             try{
