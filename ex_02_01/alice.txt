@@ -1,0 +1,7 @@
+total 8
+-rw-r--r--  1 bbluewindluewind  staff  560 Sep 23 16:14 Ex_02_01.java
+-rw-r--r--  1 bbluewindluewind  staff    0 Sep 23 16:15 alice.txt
+
+-rw-r--r--  1 bluewind bluewind staff  560 Sep 23 16:14 Ex_02_01.java
+-rw-r--r--  1 bluewindbluewind  staff  560 Sep 23 16:14 Ex_02_01.java
+-rw-r--r--  1 bluewindbluewind  staff  560 Sep 23 16:14 Ex_02_01.java
