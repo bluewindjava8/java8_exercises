@@ -8,6 +8,7 @@ public class Ex_1_8 {
 
     public static void main(String[] args) {
         testExFor();
+        testOrdinaryFor();
     }
     
     public static void testExFor(){
@@ -25,16 +26,19 @@ public class Ex_1_8 {
         
     }
     
-//    public static void testOrdinaryFor(){
-//        String[] names = {"Peter", "Paul", "Mary"};
-//        List<Runnable> runners = new ArrayList<>();
+    public static void testOrdinaryFor(){
+        String[] names = {"Peter", "Paul", "Mary"};
+        List<Runnable> runners = new ArrayList<>();
             //iは実質的finalと見なされないため、不正当です。
-//        for(int i = 0; i < names.length; i++){
-//            runners.add(()->System.out.println(names[i]));
-//        }
-//        
-//        for(Runnable runner : runners){
-//            runner.run();
-//        }
-//    }
+        //String name;
+        for(int i = 0; i < names.length; i++){
+            String name = names[i];
+            //name = names[i];
+            runners.add(()->System.out.println(name));
+        }
+        
+        for(Runnable runner : runners){
+            runner.run();
+        }
+    }
 }
