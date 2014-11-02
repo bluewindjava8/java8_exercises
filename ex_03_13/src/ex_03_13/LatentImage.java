@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
 public class LatentImage {
     private Image in;
     private List<ColorTransformer> pendingOperations;
+    private boolean terminated;
     
     private LatentImage(Image image){
         in = image;
@@ -22,25 +23,29 @@ public class LatentImage {
     }
     
     public LatentImage transform(ColorTransformer trans, boolean flush){
+        if(terminated){
+            throw new IllegalStateException("Already terminated.");
+        }
         if(flush){
-            in = toImage();
-            pendingOperations.clear();
+            flush();
         }
         pendingOperations.add(trans);
         return this;
     }
     
     public LatentImage transform(UnaryOperator<Color> f, boolean flush){
+        if(terminated){
+            throw new IllegalStateException("Already terminated.");
+        }
         if(flush){
-            in = toImage();
-            pendingOperations.clear();
+            flush();
         }
         ColorTransformer trans = (x, y, xyColor) -> f.apply(xyColor);
         pendingOperations.add(trans);
         return this;
     }
     
-    public Image toImage(){
+    private Image flush(){
         int width = (int)in.getWidth();
         int height = (int)in.getHeight();
         System.out.println(width + ", " + height);
@@ -56,7 +61,14 @@ public class LatentImage {
 
             }
         }
-                
+        in = out;
+        pendingOperations.clear();        
+        return out;
+    }
+    
+    public Image toImage(){
+        Image out = flush();
+        terminated = true;
         return out;
     }
     

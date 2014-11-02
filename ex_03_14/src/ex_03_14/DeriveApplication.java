@@ -1,10 +1,11 @@
 
-package ex_03_13;
+package ex_03_14;
 
 import java.io.File;
 import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
+import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -23,36 +24,46 @@ public class DeriveApplication extends Application {
         int width = (int)image.getWidth();
         int height = (int)image.getHeight();
         
-        ColorTransformer frameGrayTrans = (x, y, color) -> (x < 10 || x >= width - 10  || y < 10 || y >= height - 10) ? Color.GREY : color;
-        Image out1 = LatentImage.from(image).transform(Color::darker, true).transform(frameGrayTrans, true).transform(Color::darker, true).toImage();
+        Transformer frameGrayTrans = (x, y, reader) -> (x < 10 || x >= width - 10  || y < 10 || y >= height - 10) ? Color.GREY : reader.getColor(x, y);
+        Image out1 = LatentImage.from(image).transform(Color::darker)
+                .transform(frameGrayTrans)
+                .transform(Color::darker)
+                .toImage();
         saveToFile(out1, "t1.jpg");
         
-        Image out2 = LatentImage.from(image)//.transform(Color::darker, false)
-                .transform(getBlurTransformer(image), true).transform(Color::darker, false).transform(Color::darker, false)
+        Image out2 = LatentImage.from(image)
+                .transform(Color::darker)
+                .transform(getBlurTransformer())
+                .transform(Color::darker)
                 .toImage();
         saveToFile(out2, "t2.jpg");
         
-        Image out3 = LatentImage.from(image).transform(Color::brighter, false).transform(getEdgeTransformer(image), true).toImage();
-        saveToFile(out3, "t3.jpg");        
+        Image out3 = LatentImage.from(image).transform(Color::brighter)
+                .transform(getEdgeTransformer()).toImage();
+        saveToFile(out3, "t3.jpg");     
+        
+        Image out4 = LatentImage.from(image).transform(Color::brighter)
+                .transform((x, y, reader) -> reader.getColor(width - 1 - x, y)).toImage();
+        saveToFile(out4, "t4.jpg");         
     }
     
-    private  static ColorTransformer getBlurTransformer(Image image){
-        return (x, y, xyColor) -> getBlurColor(x, y, image);
+    private  static Transformer getBlurTransformer(){
+        return (x, y, reader) -> getBlurColor(x, y, reader);
     }
     
-    private static ColorTransformer getEdgeTransformer(Image image){
-        return (x, y, xyColor) -> getEdgeColor(x, y, image);
+    private static Transformer getEdgeTransformer(){
+        return (x, y, reader) -> getEdgeColor(x, y, reader);
     }
     
-    private static Color getBlurColor(int x, int y, Image image){
+    private static Color getBlurColor(int x, int y, PixelReader reader){
         Point[] adjacentPoints = getAdjacent8Points(new Point(x, y));
-        return caclAverageColor(adjacentPoints, image);
+        return caclAverageColor(adjacentPoints, reader);
     }
     
-    private static Color getEdgeColor(int x, int y, Image image){
+    private static Color getEdgeColor(int x, int y, PixelReader reader){
         Point centerPoint = new Point(x, y);
         Point[] adjacent4Points = getAdjacent4Points(centerPoint);
-        return caclEdgeColor(centerPoint, adjacent4Points, image);
+        return caclEdgeColor(centerPoint, adjacent4Points, reader);
         
         
         
@@ -86,11 +97,11 @@ public class DeriveApplication extends Application {
         return adjacentPoints;
     }
     
-    private static Color caclAverageColor(Point[] points, Image image){
+    private static Color caclAverageColor(Point[] points, PixelReader reader){
         double r = 0, g = 0, b = 0;
         for(Point point : points){
             try{
-                Color color = image.getPixelReader().getColor(point.x, point.y);
+                Color color = reader.getColor(point.x, point.y);
                 r += color.getRed();
                 g += color.getGreen();
                 b += color.getBlue();
@@ -105,11 +116,11 @@ public class DeriveApplication extends Application {
         return Color.color(r, g, b);
     }
     
-    private static Color caclEdgeColor(Point centerPoint, Point[] points, Image image){
+    private static Color caclEdgeColor(Point centerPoint, Point[] points, PixelReader reader){
         double r = 0, g = 0, b = 0;
         for(Point point : points){
             try{
-                Color color = image.getPixelReader().getColor(point.x, point.y);
+                Color color = reader.getColor(point.x, point.y);
                 r += color.getRed();
                 g += color.getGreen();
                 b += color.getBlue();
@@ -117,7 +128,7 @@ public class DeriveApplication extends Application {
                 
             }
         }
-        Color centerPointColor = image.getPixelReader().getColor(centerPoint.x, centerPoint.y);
+        Color centerPointColor = reader.getColor(centerPoint.x, centerPoint.y);
         double centerPointRed = centerPointColor.getRed();
         double centerPointGreen = centerPointColor.getGreen();
         double centerPointBlue = centerPointColor.getBlue();
