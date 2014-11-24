@@ -69,7 +69,7 @@ public class Ex_04_10 extends Application {
         WebHistory history = engine.getHistory();
         ObservableList<WebHistory.Entry> entryList = history.getEntries();
         int currentIndex = history.getCurrentIndex();
-        history.go(currentIndex > 0 ? -1 : 0);
+        new Thread(()->history.go(currentIndex > 0 ? -1 : 0)).start();
         return entryList.get(currentIndex>0?currentIndex-1:currentIndex).getUrl();
         
     }
