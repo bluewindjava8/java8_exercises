@@ -1,6 +1,7 @@
 
 package ex_05_07;
 
+import java.security.InvalidParameterException;
 import java.time.LocalTime;
 
 public class TimeInterval {
@@ -8,6 +9,9 @@ public class TimeInterval {
     private LocalTime end;
     
     private TimeInterval(LocalTime start, LocalTime end){
+        if(start.equals(end) || start.isAfter(end)){
+            throw new InvalidParameterException("Start should be earlier than end.");
+        }
         this.start = start;
         this.end = end;
     }
@@ -32,4 +36,10 @@ public class TimeInterval {
         return start.equals(interval.start) && end.equals(interval.end);
     }
     
+    public boolean isOverlapping(TimeInterval interval){
+        TimeInterval earlierStartedInterval = !this.start.isAfter(interval.start) ? this : interval;
+        TimeInterval laterStartedInterval = earlierStartedInterval == this ? interval : this;
+        
+        return laterStartedInterval.start.isBefore(earlierStartedInterval.end);
+    }
 }
