@@ -1,0 +1,9 @@
+Item1---Asia/Tokyo---2014-12-06T17:30:10
+Item2---Asia/Shanghai---2014-12-06T16:30:50
+Item3---Etc/GMT+9---2014-12-06T13:30:00
+Item4---Etc/GMT+8---2014-12-06T13:30:00
+Item5---Africa/Nairobi---2014-12-06T13:30:00
+Item6---America/Marigot---2014-12-06T13:30:00
+Item7---Asia/Shanghai---2014-12-06T16:31:00
+Item8---Asia/Shanghai---2014-12-06T16:32:10
+Item9---Asia/Shanghai---2014-12-06T16:32:20
