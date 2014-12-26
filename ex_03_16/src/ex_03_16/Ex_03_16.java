@@ -49,11 +49,18 @@ public class Ex_03_16 {
     
     //secondは正常結果と例外両方消費できますので、三番目の引数は必要ありません。
     public static <T> void doInOrderAsync(Supplier<T> first, BiConsumer<T, Throwable> second){
-        try{
-            T result = first.get();
-            second.accept(result, null);
-        }catch(Throwable t){
-            second.accept(null, t);
-        }
+        Thread t = new Thread(){
+            @Override
+            public void run(){
+                try{
+                     T result = first.get();
+                     second.accept(result, null);
+                 }catch(Throwable t){
+                     second.accept(null, t);
+                 } 
+            }
+        };
+        t.start();
+
     }
 }
