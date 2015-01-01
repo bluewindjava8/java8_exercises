@@ -44,7 +44,7 @@ public class Ex_06_10 {
             final String USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/34.0.1847.131 Safari/537.36";
             //add request header
             con.setRequestProperty("User-Agent", USER_AGENT);
-
+            con.connect();
             int responseCode = con.getResponseCode();
             System.out.println("\nSending 'GET' request to URL : " + url);
             System.out.println("Response Code : " + responseCode);
