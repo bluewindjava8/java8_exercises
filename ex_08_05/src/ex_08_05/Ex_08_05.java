@@ -41,5 +41,6 @@ public class Ex_08_05 {
             if(word.length() > 12)
                 counter.incrementAndGet();
         });
+        System.out.println(counter.get());
     }
 }
