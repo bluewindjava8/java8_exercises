@@ -11,10 +11,10 @@ public class Ex_08_10 {
 
     public static void main(String[] args) throws IOException {
         Path path = Paths.get("/", "Users", "bluewind", "java8_exercises", "ex_08_03");
-        showDir(path, "static", "Test");
+        find(path, "static", "Test");
     }
     
-    public static void showDir(Path path, String keyword1, String keyword2) throws IOException{
+    public static void find(Path path, String keyword1, String keyword2) throws IOException{
         try(Stream<Path> entries = Files.walk(path)){
             //entries.forEach(entry -> System.out.println(entry.getFileName()));
             //long count = entries.filter(entry -> entry.toFile().isFile() ).count();
