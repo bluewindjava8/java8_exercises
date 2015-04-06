@@ -1,0 +1,12 @@
+washsington,
+ut,
+123456789
+newyork,
+ny,
+12345
+altlanta,
+ap,
+54321
+bad,
+bad,
+1234s
