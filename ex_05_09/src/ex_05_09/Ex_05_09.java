@@ -14,7 +14,7 @@ public class Ex_05_09 {
         Instant now = Instant.now();
         
         zoneIds.stream().map(zoneId -> ZonedDateTime.ofInstant(now, ZoneId.of(zoneId)))
-                .filter(zonedDateTime -> Math.abs(zonedDateTime.getOffset().getTotalSeconds()) < 3600 )
+                .filter(zonedDateTime -> Math.abs(zonedDateTime.getOffset().getTotalSeconds()) % 3600 != 0 )
                 .forEach(zonedDateTime -> {
                     System.out.print(zonedDateTime.getZone() + " : ");
                     System.out.println(zonedDateTime.getOffset());

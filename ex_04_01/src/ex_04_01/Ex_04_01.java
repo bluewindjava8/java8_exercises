@@ -37,7 +37,7 @@ public class Ex_04_01 extends Application {
     }
 
     public static void main(String[] args) {
-
+        launch(args);
     }
     
 }
