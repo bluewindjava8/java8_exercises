@@ -4,6 +4,7 @@ package ex_03_09;
 import java.lang.reflect.Field;
 import java.security.InvalidParameterException;
 import java.util.Comparator;
+import java.util.function.Function;
 
 public class Person{
     private String lastName;
@@ -53,3 +54,12 @@ public class Person{
     }
     
 }
+
+class Test{
+    public static void test(){
+        Comparable c = (Comparable) new Test();
+        Function f = (Function) new Test();
+        //Test t = (Test)new Person();
+    }
+}
+
