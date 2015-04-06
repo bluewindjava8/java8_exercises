@@ -1,4 +1,0 @@
-Washsington,    UT,   123456789
-Newyork,    NY,   12345
-Altlanta,    AP,   54321
-bad,    bad,  1234s
