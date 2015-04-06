@@ -17,7 +17,7 @@ public class Ex_08_11 {
 
     public static void main(String[] args) throws IOException {
         surfWithAuthorization("http://stackoverflow.com/users/4600627/bluewind",
-                "bluiewindice@hotmail.com", "LIUliu33###");
+                "xxxxx@hotmail.com", "xxxxx###");
         
     }
     
