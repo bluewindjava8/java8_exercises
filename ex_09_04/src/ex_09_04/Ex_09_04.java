@@ -1,14 +1,10 @@
 package ex_09_04;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.net.MalformedURLException;
-import java.net.URL;
 
+import java.io.FileNotFoundException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -16,7 +12,6 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
@@ -35,13 +30,13 @@ public static void main(String[] args) throws IOException {
             Base64.Encoder encoder = Base64.getEncoder();
             String encodedNameAndPassword = encoder.encodeToString(plainNameAndPassword.getBytes(StandardCharsets.UTF_8));
 
-            URL url = new URL(address);
+            URL url = new URL(address);//MalformedURLException
             URLConnection connection = url.openConnection();
             connection.setRequestProperty("Authorization", "Basic " + encodedNameAndPassword);
             connection.connect();
             InputStream in = connection.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("result.txt")));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("result.txt")));//FileNotFoundException
 
 
             String currentLine;
@@ -50,9 +45,9 @@ public static void main(String[] args) throws IOException {
                 writer.write(currentLine);
                 writer.newLine();
             }
-        }catch(MalformedURLException | FileNotFoundException  | UnknownHostException ex){
+        }catch(MalformedURLException | FileNotFoundException ex){
             throw ex;
         }
         
-    }
+    } 
 }

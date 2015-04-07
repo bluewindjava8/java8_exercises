@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Redmine for W.S. Development Center</title>
+<meta name="description" content="Redmine" />
+<meta name="keywords" content="issue,bug,tracker" />
+<meta content="authenticity_token" name="csrf-param" />
+<meta content="x5/7NxSCu9JZQvSkXuCvGgEuJ6eNq5WM+Egya6qYnBY=" name="csrf-token" />
+<link rel='shortcut icon' href='/redmine/favicon.ico?1383782632' />
+<link href="/redmine/stylesheets/jquery/jquery-ui-1.9.2.css?1383782632" media="all" rel="stylesheet" type="text/css" />
+<link href="/redmine/themes/a1/stylesheets/application.css?1367260644" media="all" rel="stylesheet" type="text/css" />
+
+<script src="/redmine/javascripts/jquery-1.8.3-ui-1.9.2-ujs-2.0.3.js?1383782632" type="text/javascript"></script>
+<script src="/redmine/javascripts/application.js?1385340318" type="text/javascript"></script>
+<script type="text/javascript">
+//<![CDATA[
+$(window).load(function(){ warnLeavingUnsaved('このページから移動すると、保存されていないデータが失われます。'); });
+//]]>
+</script>
+<script src="/redmine/themes/a1/javascripts/theme.js?1355323826" type="text/javascript"></script>
+<link href="/redmine/plugin_assets/redmine_banner/stylesheets/banner.css?1385717240" media="screen" rel="stylesheet" type="text/css" /><script src="/redmine/plugin_assets/redmine_banner/javascripts/banner.js?1385717240" type="text/javascript"></script>     <link href="/redmine/plugin_assets/redmine_issue_templates/stylesheets/issue_templates.css?1406282161" media="screen" rel="stylesheet" type="text/css" /> 
+ <link href="/redmine/plugin_assets/redmine_wiki_templates/stylesheets/wiki_templates.css?1385717240" media="screen" rel="stylesheet" type="text/css" />
+ <link href="/redmine/plugin_assets/clipboard_image_paste/stylesheets/jquery.Jcrop-0.9.10.min.css?1385717238" media="all" rel="stylesheet" type="text/css" />
+<link href="/redmine/plugin_assets/clipboard_image_paste/stylesheets/clipboard_image_paste.css?1385717238" media="all" rel="stylesheet" type="text/css" />
+<script src="/redmine/plugin_assets/clipboard_image_paste/javascripts/jcrop-0.9.10.min.js?1385717238" type="text/javascript"></script>
+<script src="/redmine/plugin_assets/clipboard_image_paste/javascripts/clipboard_image_paste.js?1385717238" type="text/javascript"></script>
+  <script type="text/javascript">
+    var j$cbp = $;
+  </script>
+ 
+<!-- page specific tags -->
+</head>
+<body class="theme-A1 controller-account action-login">
+<div id="wrapper">
+<div id="wrapper2">
+<div id="wrapper3">
+<div id="top-menu">
+    <div id="account">
+        <ul><li><a href="/redmine/login" class="login">ログイン</a></li>
+<li><a href="/redmine/account/register" class="register">登録する</a></li></ul>    </div>
+    
+    </div>
+
+<div id="header">
+
+    <h1>Redmine for W.S. Development Center</h1>
+
+    <div id="main-menu">
+        
+    </div>
+</div>
+
+<div id="main" class="nosidebar">
+    <div id="sidebar">
+        
+        
+    </div>
+
+    <div id="content">
+        
+        
+<div id="login-form">
+<form accept-charset="UTF-8" action="/redmine/login" method="post"><div style="margin:0;padding:0;display:inline"><input name="utf8" type="hidden" value="&#x2713;" /><input name="authenticity_token" type="hidden" value="x5/7NxSCu9JZQvSkXuCvGgEuJ6eNq5WM+Egya6qYnBY=" /></div>
+<input name="back_url" type="hidden" value="http://days.nsp.ricoh.co.jp/redmine/" />
+<table>
+<tr>
+    <td align="right"><label for="username">ログイン:</label></td>
+    <td align="left"><input id="username" name="username" tabindex="1" type="text" /></td>
+</tr>
+<tr>
+    <td align="right"><label for="password">パスワード:</label></td>
+    <td align="left"><input id="password" name="password" tabindex="2" type="password" /></td>
+</tr>
+<tr>
+    <td></td>
+    <td align="left">
+        <label for="autologin"><input id="autologin" name="autologin" tabindex="4" type="checkbox" value="1" /> ログインを維持</label>
+    </td>
+</tr>
+<tr>
+    <td align="left">
+            <a href="/redmine/account/lost_password">パスワードの再発行</a>
+    </td>
+    <td align="right">
+        <input type="submit" name="login" value="ログイン &#187;" tabindex="5"/>
+    </td>
+</tr>
+</table>
+</form></div>
+
+
+<script type="text/javascript">
+//<![CDATA[
+$('#username').focus();
+//]]>
+</script>
+
+         
+        <div style="clear:both;"></div>
+    </div>
+</div>
+</div>
+
+<div id="ajax-indicator" style="display:none;"><span>ロード中...</span></div>
+<div id="ajax-modal" style="display:none;"></div>
+
+<div id="footer">
+  <div class="bgl"><div class="bgr">
+    Powered by <a href="http://www.redmine.org/">Redmine</a> &copy; 2006-2013 Jean-Philippe Lang
+  </div></div>
+</div>
+</div>
+</div>
+  
+
+
+
+    
+<span id="cbp_images_form">
+  <span id="cbp_image_fields"></span>
+  <span class="add_attachment"><a class="add_attachment" href="#" onclick="cbImagePaste.showPasteDialog(); return false;; return false;">クリップボードから画像を追加</a>
+  (サイズの上限: 512 MB)</span>
+</span>
+
+<!-- input field span inspired by redmine/app/views/attachments/_form.html.erb -->
+<span id="cbp_image_field" style="display:none">
+  <span id="cbp_attach_thumbnail_box">
+    <img id="cbp_attach_thumbnail"/>
+  </span>
+  <input id="cbp_image_data" name="attachments[nnnnn][data]" type="hidden" value="" />
+  <input class="name" maxlength="50" name="attachments[nnnnn][name]" type="text" value="" />
+  <a href="#" id="cbp_link_btn" title="画像とサムネイルへのリンク"><img alt="Link" src="/redmine/images/link.png?1383782631" /></a>
+  <input class="description" maxlength="255" name="attachments[nnnnn][description]" placeholder="任意のコメント" type="text" value="" />
+  <a href="#" onclick="cbImagePaste.removeImageField(this); return false;" title="削除"><img alt="Delete" src="/redmine/images/delete.png?1383782631" /></a>
+</span>
+
+<!-- clipboard paste dialog -->
+<div id="cbp_paste_dlg" title="クリップボードから画像を追加" style="display:none">
+  <script type="text/javascript">
+    // translated labels go here (inside namespace)
+    (function(cbImagePaste, $, undefined) {
+      cbImagePaste.cbp_txt_add_image       = "クリップボードから画像を追加";
+      cbImagePaste.cbp_txt_crop_box        = "選択した領域:  x={1}  y={2}  幅={3}  高さ={4}";
+      cbImagePaste.cbp_txt_print           = "Ctrl+Vで画像を貼り付けてください。";
+      cbImagePaste.cbp_txt_select          = "ドラッグして画像の貼り付けたい領域を選択してください。";
+      cbImagePaste.cbp_txt_deselect        = "選択を解除するには領域の外側をクリックしてください。";
+      cbImagePaste.cbp_txt_empty_cb        = "クリップボードが空です。";
+      cbImagePaste.cbp_txt_no_image_cb     = "クリップボードに画像がありません。";
+      cbImagePaste.cbp_txt_no_image_pst    = "何も画像が貼り付けられていません。";
+      cbImagePaste.cbp_txt_too_many_files  = "これ以上ファイルを追加できません。一度の更新で添付できるファイルの数は10個までです。";
+      cbImagePaste.cbp_txt_wrong_browser   = "お使いのブラウザはクリップボードAPIをサポートしていません。Firefox 5以上かGoogle Chrome 13以上をお使いください。";
+      cbImagePaste.cbp_txt_btn_ok          = "OK";
+      cbImagePaste.cbp_txt_btn_cancel      = "キャンセル";
+      cbImagePaste.cbp_txt_too_big_image   = "このファイルはアップロードできません。添付ファイルサイズの上限(512 MB)を超えています。";
+      cbImagePaste.cbp_max_attach_size     = 536870912;
+      cbImagePaste.cbp_max_attachments     = 10;
+      cbImagePaste.cbp_min_chrome_ver      = 535;
+      cbImagePaste.cbp_min_firefox_ver     = 5;
+      cbImagePaste.cbp_act_update_id       = 556;
+    }(window.cbImagePaste = window.cbImagePaste || {}, j$cbp));
+  </script>
+
+  <div id="cbp_header_box">
+    <!-- canvas id="cbp_thumbnail" width="60" height="60"></canvas -->
+    <div id="cbp_instructions">&nbsp;</div>
+  </div>
+  <div id="cbp_panel_box">
+    <!-- place for pasted image editor -->
+  </div>
+</div>
+
+<!-- dialog to copy image link for wiki -->
+<div id="cbp_link_dlg" title="画像とサムネイルへのリンク" style="display:none">
+  <input type="text" id="cbp_image_link" readonly />
+  <p/>
+  <input type="text" id="cbp_thumbnail_link" readonly />
+</div>
+
+</body>
+</html>
