@@ -1,6 +1,6 @@
 package ex_09_08;
 
-public class Point{
+public class Point implements Comparable<Point>{
     private int x;
     private int y;
     
@@ -9,6 +9,7 @@ public class Point{
         this.y = y;
     }
     
+    @Override
     public int compareTo(Point other){
         if(x > other.x){
             return 1;
