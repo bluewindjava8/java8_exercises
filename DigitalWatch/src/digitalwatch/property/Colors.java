@@ -4,8 +4,8 @@ package digitalwatch.property;
 import javafx.scene.paint.Color;
 
 public class Colors {
-    private Color fontColor;
-    private Color backgroundColor;
+    private final Color fontColor;
+    private final Color backgroundColor;
     
     public Colors(Color fontColor, Color backgroundColor){
         this.fontColor = fontColor;

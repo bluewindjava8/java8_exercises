@@ -8,23 +8,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class WatchPreferences {
-
-//    private String fontName;
-//    private String fontStyle;
-//    private double fontSize;
-//
-//    private double fontColorR;
-//    private double fontColorG;
-//    private double fontColorB;
-//
-//    private double backgroundColorR;
-//    private double backgroundColorG;
-//    private double backgroundColorB;
-//
-//    private int winPosX;
-//    private int winPosY;
-    //private static final String NODE_PATH = WatchPreferences.class.getCanonicalName() + "1";
-    private static final String NODE_PATH = "bluewind" + "3";
+    private static final String NODE_PATH = WatchPreferences.class.getCanonicalName();
 
     Preferences prefsRoot = Preferences.userRoot();
     Preferences prefs = prefsRoot.node(NODE_PATH);
