@@ -5,6 +5,7 @@ import digitalwatch.arcadjuster.HourArcAdjuster;
 import digitalwatch.arcadjuster.MinuteArcAdjuster;
 import digitalwatch.arcadjuster.SecondArcAdjuster;
 import digitalwatch.property.ColorSelectDialog;
+import digitalwatch.property.Colors;
 import digitalwatch.property.PropertyDialog;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -55,22 +56,23 @@ public class DigitalWatch extends Application {
 
     private static final int MENU_BAR_HEIGHT = 30;
     private static final int ARC_STROKE_WIDTH = 10;
-    Group root = new Group();
-    Scene scene = new Scene(root, 400, 400);
-    Stage stage ;
+    private Group root = new Group();
+    private Scene scene = new Scene(root, 400, 400);
+    private Stage stage;
 
-    Arc secondArc = generateArc(10, Color.BLACK, root);
-    Arc minuteArc = generateArc(10, Color.BLUE, root);
-    Arc hourArc = generateArc(10, Color.RED, root);
+    private Arc secondArc = generateArc(10, Color.BLACK, root);
+    private Arc minuteArc = generateArc(10, Color.BLUE, root);
+    private Arc hourArc = generateArc(10, Color.RED, root);
 
-    Canvas canvas;
-    GraphicsContext gc;
+    private Canvas canvas;
+    private GraphicsContext gc;
 
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
         root = new Group();
         scene = new Scene(root, 400, 400);
+        scene.setOnMouseMoved(event -> System.out.println("x =" + event.getX() + ", y = " + event.getY()));
 
         secondArc = generateArc(10, Color.BLACK, root);
         minuteArc = generateArc(10, Color.BLUE, root);
@@ -80,6 +82,8 @@ public class DigitalWatch extends Application {
         gc = canvas.getGraphicsContext2D();
         //drawShapes(gc);
         drawText();
+        canvas.widthProperty().bind(scene.widthProperty());
+        canvas.heightProperty().bind(scene.heightProperty());
         root.getChildren().add(canvas);
 
         bindComponents();
@@ -104,6 +108,21 @@ public class DigitalWatch extends Application {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         //Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), ev -> arc.setLength(arc.getLength() + 10)));
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), ev -> {
+
+            Text text = new Text("00:00:00");
+            text.setFont(gc.getFont());
+            double textWidth = text.getLayoutBounds().getWidth();
+            double textHeight = text.getLayoutBounds().getHeight();
+
+            if (textWidth / 2 > hourArc.getRadiusX()) {
+                stage.setWidth(textWidth * 1.3 * 1.7 + MENU_BAR_HEIGHT);
+                stage.setHeight(stage.getHeight());
+                System.out.println("xxxxxxstage width = " + stage.getWidth());
+                System.out.println("xxxxxscene width = " + scene.getWidth());
+                stage.hide();
+                stage.show();
+            }
+
             secondAdjuster.adjustArcByCurrentTime(secondArc);
             minuteAdjuster.adjustArcByCurrentTime(minuteArc);
             hourAdjuster.adjustArcByCurrentTime(hourArc);
@@ -111,15 +130,13 @@ public class DigitalWatch extends Application {
             LocalTime now = LocalTime.now();
             String timeStr = formatter.format(now);
 
-            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            Text text = new Text("00:00:00");
-            text.setFont(gc.getFont());
-            double textWidth = text.getLayoutBounds().getWidth();
-            double textHeight = text.getLayoutBounds().getHeight();
-
+            System.out.println("canvas.getWidth() = " + canvas.getWidth() + ", canvas.getHeight() = " + canvas.getHeight());
             System.out.println("font width = " + textWidth + ", font height = " + textHeight);
             System.out.println("text.x =" + (secondArc.getCenterX() - textWidth / 2) + ", text.y = " + (secondArc.getCenterY() - textHeight / 2));
             System.out.println("centerx = " + secondArc.getCenterX() + ", centery = " + secondArc.getCenterY());
+            System.out.println("centerxproperty = " + secondArc.centerXProperty().get() + ", centeryproperty = " + secondArc.centerYProperty().get());
+            System.out.println("radx = " + secondArc.getRadiusX() + ", rady = " + secondArc.getRadiusY());
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
             gc.fillText(timeStr, secondArc.getCenterX() - textWidth / 2, secondArc.getCenterY());
 
         }));
@@ -207,16 +224,7 @@ public class DigitalWatch extends Application {
                 .showFontSelector(Font.font("Times New Roman"));
 
         response.ifPresent(font -> {
-            System.out.println("\n" + font.toString());
-            Text text = new Text("00:00:00");
-            text.setFont(font);
-            text.setFill(Color.RED);
-            double textWidth = text.getLayoutBounds().getWidth();
-            if (textWidth > hourArc.getRadiusX() * 2 - 20) {
-                stage.setWidth(stage.getWidth() * 1.1);
-                stage.setHeight(stage.getHeight() * 1.1);
-            }
-            System.out.println(text.getLayoutBounds().getWidth());
+            System.out.println("font changed.");
             gc.setFont(font);
 
         });
@@ -224,9 +232,10 @@ public class DigitalWatch extends Application {
 
     private void selectColor() {
         Dialog colorDialog = new ColorSelectDialog();
-        Optional<Color[]> colorsOptional = colorDialog.showAndWait();
-        colorsOptional.ifPresent(colors -> {
-            Stream.of(colors).forEach(System.out::println);
+        Optional<Colors> colorsOptional = colorDialog.showAndWait();
+        colorsOptional.ifPresent(colors ->{
+            System.out.println(colors);
+            
         });
     }
 

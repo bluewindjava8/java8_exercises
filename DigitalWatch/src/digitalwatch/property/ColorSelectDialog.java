@@ -15,7 +15,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 
-public class ColorSelectDialog extends Dialog<Color[]> {
+public class ColorSelectDialog extends Dialog<Colors> {
 
     public ColorSelectDialog() {
         setTitle("Color Select Dialog");
@@ -63,7 +63,7 @@ public class ColorSelectDialog extends Dialog<Color[]> {
         // Convert the result to a username-password-pair when the login button is clicked.
         setResultConverter(dialogButton -> {
             if (dialogButton == ButtonType.OK) {
-                return new Color[]{fontColorPicker.getValue(), backgroundColorPicker.getValue()};
+                return new Colors(fontColorPicker.getValue(), backgroundColorPicker.getValue());
             }
             return null;
         });
