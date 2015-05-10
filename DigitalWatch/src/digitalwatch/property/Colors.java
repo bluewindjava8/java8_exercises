@@ -22,6 +22,6 @@ public class Colors {
     
     @Override
     public String toString(){
-        return "yyyyyyyyyyyy font color = " + fontColor + ", background color = " + backgroundColor;
+        return "font color = " + fontColor + ", background color = " + backgroundColor;
     }
 }

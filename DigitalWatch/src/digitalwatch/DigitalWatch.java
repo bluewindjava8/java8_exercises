@@ -4,9 +4,12 @@ import digitalwatch.arcadjuster.ArcAdjuster;
 import digitalwatch.arcadjuster.HourArcAdjuster;
 import digitalwatch.arcadjuster.MinuteArcAdjuster;
 import digitalwatch.arcadjuster.SecondArcAdjuster;
+import digitalwatch.prefs.Point;
+import digitalwatch.prefs.WatchPreferences;
 import digitalwatch.property.ColorSelectDialog;
 import digitalwatch.property.Colors;
 import digitalwatch.property.PropertyDialog;
+//import java.awt.Point;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -39,15 +42,18 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.TextField;
+//import javafx.scene.effect.Light.Point;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import javafx.util.Pair;
 import org.controlsfx.dialog.Dialogs;
@@ -60,6 +66,9 @@ public class DigitalWatch extends Application {
     private Scene scene = new Scene(root, 400, 400);
     private Stage stage;
 
+    private ArcAdjuster secondAdjuster = new SecondArcAdjuster();
+    private ArcAdjuster minuteAdjuster = new MinuteArcAdjuster();
+    private ArcAdjuster hourAdjuster = new HourArcAdjuster();
     private Arc secondArc = generateArc(10, Color.BLACK, root);
     private Arc minuteArc = generateArc(10, Color.BLUE, root);
     private Arc hourArc = generateArc(10, Color.RED, root);
@@ -67,21 +76,59 @@ public class DigitalWatch extends Application {
     private Canvas canvas;
     private GraphicsContext gc;
 
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    WatchPreferences watchPref = new WatchPreferences();
+
+    @Override
+    public void init() throws Exception {
+        super.init();
+
+    }
+
+    @Override
+    public void stop() throws Exception {
+//        System.out.println("Stage is stopping");
+//        Font font = gc.getFont();
+//        watchPref.putFont(font);
+//        watchPref.putFontColor((Color) gc.getFill());
+//        watchPref.putBackgroundColor((Color) scene.getFill());
+//        //Point winPos = new Point(scene.getX(), scene.getY());
+//        Point leftUpCorner = new Point(stage.getX(), stage.getY());
+//        watchPref.putPos(leftUpCorner);
+
+        saveWatchPreferences();
+        super.stop();
+
+    }
+
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
         root = new Group();
-        scene = new Scene(root, 400, 400);
-        scene.setOnMouseMoved(event -> System.out.println("x =" + event.getX() + ", y = " + event.getY()));
+        scene = new Scene(root, 400, 400, Color.BLACK);
+        scene.setOnMouseClicked(event -> System.out.println("X = " + event.getX() + ", Y = " + event.getY()));
 
         secondArc = generateArc(10, Color.BLACK, root);
         minuteArc = generateArc(10, Color.BLUE, root);
         hourArc = generateArc(10, Color.RED, root);
 
+        Line line = new Line();
+        line.startXProperty().set(0);
+        line.startYProperty().bind(secondArc.centerYProperty());
+        line.endXProperty().bind(scene.widthProperty());
+        line.endYProperty().bind(secondArc.centerYProperty());
+        root.getChildren().add(line);
+        
+        Line vline = new Line();
+        vline.startYProperty().set(0);
+        vline.startXProperty().bind(secondArc.centerXProperty());
+        vline.endYProperty().bind(scene.heightProperty());
+        vline.endXProperty().bind(secondArc.centerXProperty());
+        root.getChildren().add(vline);        
+
         canvas = new Canvas(400, 400);
         gc = canvas.getGraphicsContext2D();
-        //drawShapes(gc);
-        drawText();
+
         canvas.widthProperty().bind(scene.widthProperty());
         canvas.heightProperty().bind(scene.heightProperty());
         root.getChildren().add(canvas);
@@ -89,55 +136,23 @@ public class DigitalWatch extends Application {
         bindComponents();
         createMenu(primaryStage);
 
+        restoreWatchPreferences();
+
         primaryStage.setResizable(false);
-        primaryStage.setTitle("Hello World!");
+        primaryStage.setTitle("Digital Watch");
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        ArcAdjuster secondAdjuster = new SecondArcAdjuster();
-        ArcAdjuster minuteAdjuster = new MinuteArcAdjuster();
-        ArcAdjuster hourAdjuster = new HourArcAdjuster();
+        drawArcs();
+        drawTimeStr();
 
-        primaryStage.widthProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) -> {
-            primaryStage.setHeight(t1.doubleValue());
-        });
-        primaryStage.heightProperty().addListener((ObservableValue<? extends Number> ov, Number t, Number t1) -> {
-            primaryStage.setWidth(t1.doubleValue());
-        });
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        //Timeline timeline = new Timeline(new KeyFrame(Duration.seconds(1), ev -> arc.setLength(arc.getLength() + 10)));
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(1000), ev -> {
-
-            Text text = new Text("00:00:00");
-            text.setFont(gc.getFont());
-            double textWidth = text.getLayoutBounds().getWidth();
-            double textHeight = text.getLayoutBounds().getHeight();
-
-            if (textWidth / 2 > hourArc.getRadiusX()) {
-                stage.setWidth(textWidth * 1.3 * 1.7 + MENU_BAR_HEIGHT);
-                stage.setHeight(stage.getHeight());
-                System.out.println("xxxxxxstage width = " + stage.getWidth());
-                System.out.println("xxxxxscene width = " + scene.getWidth());
-                stage.hide();
+            if (!stage.isShowing()) {
                 stage.show();
             }
 
-            secondAdjuster.adjustArcByCurrentTime(secondArc);
-            minuteAdjuster.adjustArcByCurrentTime(minuteArc);
-            hourAdjuster.adjustArcByCurrentTime(hourArc);
-
-            LocalTime now = LocalTime.now();
-            String timeStr = formatter.format(now);
-
-            System.out.println("canvas.getWidth() = " + canvas.getWidth() + ", canvas.getHeight() = " + canvas.getHeight());
-            System.out.println("font width = " + textWidth + ", font height = " + textHeight);
-            System.out.println("text.x =" + (secondArc.getCenterX() - textWidth / 2) + ", text.y = " + (secondArc.getCenterY() - textHeight / 2));
-            System.out.println("centerx = " + secondArc.getCenterX() + ", centery = " + secondArc.getCenterY());
-            System.out.println("centerxproperty = " + secondArc.centerXProperty().get() + ", centeryproperty = " + secondArc.centerYProperty().get());
-            System.out.println("radx = " + secondArc.getRadiusX() + ", rady = " + secondArc.getRadiusY());
-            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-            gc.fillText(timeStr, secondArc.getCenterX() - textWidth / 2, secondArc.getCenterY());
+            drawArcs();
+            drawTimeStr();
 
         }));
 
@@ -152,20 +167,10 @@ public class DigitalWatch extends Application {
         arc.setType(ArcType.OPEN);
         arc.setFill(null);
         arc.setStroke(strokeColor);
-        arc.setStrokeWidth(strokeWith);
+        arc.setStrokeWidth(1);
         root.getChildren().add(arc);
 
         return arc;
-    }
-
-    private void drawText() {
-        gc.setFill(Color.GREEN);
-        gc.setStroke(Color.BLUE);
-        //Font font = new Font()
-        //gc.setFont();
-        gc.setLineWidth(5);
-        gc.fillText("12:33:55", 40, 50);
-        gc.strokeLine(40, 10, 10, 40);
     }
 
     private void bindComponents() {
@@ -210,14 +215,6 @@ public class DigitalWatch extends Application {
         menuBar.getMenus().add(fileMenu);
     }
 
-//    private void showPropertyDialog() {
-//        PropertyDialog dialog = new PropertyDialog();
-//        Optional<Pair<String, String>> result = dialog.showAndWait();
-//
-//        result.ifPresent(usernamePassword -> {
-//            System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
-//        });
-//    }
     private void selectFont() {
         Optional<Font> response = Dialogs.create()
                 .masthead("Choose what you like")
@@ -226,81 +223,76 @@ public class DigitalWatch extends Application {
         response.ifPresent(font -> {
             System.out.println("font changed.");
             gc.setFont(font);
-
+            //this.redrawAllComponents();
+            this.resizeSceneByFont();
+            this.drawTimeStr();
         });
     }
 
     private void selectColor() {
         Dialog colorDialog = new ColorSelectDialog();
         Optional<Colors> colorsOptional = colorDialog.showAndWait();
-        colorsOptional.ifPresent(colors ->{
+        colorsOptional.ifPresent(colors -> {
             System.out.println(colors);
-            
+            gc.setFill(colors.getFontColor());
+
+            drawTimeStr();
+
+            scene.setFill(colors.getBackgroundColor());
         });
     }
 
-    /*
-     private void showPropertyDialog() {
-     // Create the custom dialog.
-     Dialog<Pair<String, String>> dialog = new Dialog<>();
-     dialog.setTitle("Login Dialog");
-     dialog.setHeaderText("Look, a Custom Login Dialog");
 
-     // Set the icon (must be included in the project).
-     //dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
+    private void resizeSceneByFont() {
+        Text text = new Text("00:00:00");
+        text.setFont(gc.getFont());
+        double textWidth = text.getLayoutBounds().getWidth();
+        double newWidth = (textWidth + 15) * 1.3 * 1.7 + MENU_BAR_HEIGHT;
+        stage.setWidth(newWidth);
+        stage.setHeight(newWidth);
+        stage.hide();
+        stage.show();
+    }
 
-     // Set the button types.
-     ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
-     dialog.getDialogPane().getButtonTypes().addAll(loginButtonType, ButtonType.CANCEL);
+    private void drawArcs() {
+        secondAdjuster.adjustArcByCurrentTime(secondArc);
+        minuteAdjuster.adjustArcByCurrentTime(minuteArc);
+        hourAdjuster.adjustArcByCurrentTime(hourArc);
+    }
 
-     // Create the username and password labels and fields.
-     GridPane grid = new GridPane();
-     grid.setHgap(10);
-     grid.setVgap(10);
-     grid.setPadding(new Insets(20, 150, 10, 10));
+    private void drawTimeStr() {
+        Text text = new Text("00:00:00");
+        text.setFont(gc.getFont());
+        double textWidth = text.getLayoutBounds().getWidth();
 
-     TextField username = new TextField();
-     username.setPromptText("Username");
-     PasswordField password = new PasswordField();
-     password.setPromptText("Password");
+        LocalTime now = LocalTime.now();
+        String timeStr = formatter.format(now);
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        //gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
+        gc.fillText(timeStr, secondArc.getCenterX() - textWidth / 2, secondArc.getCenterY());
+    }
 
-     grid.add(new Label("Username:"), 0, 0);
-     grid.add(username, 1, 0);
-     grid.add(new Label("Password:"), 0, 1);
-     grid.add(password, 1, 1);
+    private void saveWatchPreferences() {
+        Font font = gc.getFont();
+        watchPref.putFont(font);
+        watchPref.putFontColor((Color) gc.getFill());
+        watchPref.putBackgroundColor((Color) scene.getFill());
+        Point leftUpCorner = new Point(stage.getX(), stage.getY());
+        watchPref.putPos(leftUpCorner);
+    }
 
-     // Enable/Disable login button depending on whether a username was entered.
-     Node loginButton = dialog.getDialogPane().lookupButton(loginButtonType);
-     loginButton.setDisable(true);
+    private void restoreWatchPreferences() {
+        gc.setFont(watchPref.getFont(gc.getFont()));
+        gc.setFill(watchPref.getFontColor(Color.BLACK));
+        scene.setFill(watchPref.getBackgroundColor(Color.TRANSPARENT));
 
-     // Do some validation (using the Java 8 lambda syntax).
-     username.textProperty().addListener((observable, oldValue, newValue) -> {
-     loginButton.setDisable(newValue.trim().isEmpty());
-     });
+        Point leftUpCorner = watchPref.getPos(new Point(stage.getX(), stage.getY()));
+        stage.setX(leftUpCorner.getX());
+        stage.setY(leftUpCorner.getY());
 
-     dialog.getDialogPane().setContent(grid);
+        resizeSceneByFont();
+    }
 
-     // Request focus on the username field by default.
-     Platform.runLater(() -> username.requestFocus());
-
-     // Convert the result to a username-password-pair when the login button is clicked.
-     dialog.setResultConverter(dialogButton -> {
-     if (dialogButton == loginButtonType) {
-     return new Pair<>(username.getText(), password.getText());
-     }
-     return null;
-     });
-
-     Optional<Pair<String, String>> result = dialog.showAndWait();
-
-     result.ifPresent(usernamePassword -> {
-     System.out.println("Username=" + usernamePassword.getKey() + ", Password=" + usernamePassword.getValue());
-     });
-     }
-     */
-    /**
-     * @param args the command line arguments
-     */
     public static void main(String[] args) {
         launch(args);
     }
