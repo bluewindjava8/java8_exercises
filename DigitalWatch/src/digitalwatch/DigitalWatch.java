@@ -8,7 +8,6 @@ import digitalwatch.prefs.Point;
 import digitalwatch.prefs.WatchPreferences;
 import digitalwatch.property.ColorSelectDialog;
 import digitalwatch.property.Colors;
-//import java.awt.Point;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -18,6 +17,9 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -27,6 +29,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.ArcType;
@@ -34,6 +37,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.controlsfx.dialog.Dialogs;
 
@@ -86,6 +90,16 @@ public class DigitalWatch extends Application {
         root = new Group();
         scene = new Scene(root, 400, 400, Color.BLACK);
         scene.setOnMouseClicked(event -> System.out.println("X = " + event.getX() + ", Y = " + event.getY()));
+        stage.initStyle(StageStyle.UNDECORATED);
+        //stage.setFullScreen(true);
+        //stage.initOwner(null);
+        stage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
+            @Override
+            public void changed(ObservableValue<? extends Boolean> prop, Boolean wasIconified, Boolean isIconified) {
+                System.out.println("iiiiiiiiiiiiiignore fullscreen");
+                //stage.setFullScreen(false);
+            }
+        });
 
         secondArc = generateArc(10, Color.BLACK, root);
         minuteArc = generateArc(10, Color.BLUE, root);
@@ -97,13 +111,13 @@ public class DigitalWatch extends Application {
         line.endXProperty().bind(scene.widthProperty());
         line.endYProperty().bind(secondArc.centerYProperty());
         root.getChildren().add(line);
-        
+
         Line vline = new Line();
         vline.startYProperty().set(0);
         vline.startXProperty().bind(secondArc.centerXProperty());
         vline.endYProperty().bind(scene.heightProperty());
         vline.endXProperty().bind(secondArc.centerXProperty());
-        root.getChildren().add(vline);        
+        root.getChildren().add(vline);
 
         canvas = new Canvas(400, 400);
         gc = canvas.getGraphicsContext2D();
@@ -171,6 +185,9 @@ public class DigitalWatch extends Application {
 
     }
 
+    private double xOffset = 0;
+    private double yOffset = 0;
+
     private void createMenu(Stage primaryStage) {
         MenuBar menuBar = new MenuBar();
         menuBar.prefWidthProperty().bind(primaryStage.widthProperty());
@@ -192,6 +209,22 @@ public class DigitalWatch extends Application {
                 new SeparatorMenuItem(), exitMenuItem);
 
         menuBar.getMenus().add(fileMenu);
+
+        menuBar.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                xOffset = primaryStage.getX() - event.getScreenX();
+                yOffset = primaryStage.getY() - event.getScreenY();
+            }
+        });
+        
+        menuBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                primaryStage.setX(event.getScreenX() + xOffset);
+                primaryStage.setY(event.getScreenY() + yOffset);
+            }
+        });
     }
 
     private void selectFont() {
@@ -210,6 +243,7 @@ public class DigitalWatch extends Application {
 
     private void selectColor() {
         Dialog colorDialog = new ColorSelectDialog();
+        colorDialog.initOwner(stage);
         Optional<Colors> colorsOptional = colorDialog.showAndWait();
         colorsOptional.ifPresent(colors -> {
             System.out.println(colors);
@@ -220,7 +254,6 @@ public class DigitalWatch extends Application {
             scene.setFill(colors.getBackgroundColor());
         });
     }
-
 
     private void resizeSceneByFont() {
         Text text = new Text("00:00:00");
