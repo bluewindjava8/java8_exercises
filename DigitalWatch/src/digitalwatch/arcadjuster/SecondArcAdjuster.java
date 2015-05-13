@@ -11,7 +11,8 @@ public class SecondArcAdjuster implements ArcAdjuster{
         LocalTime time = LocalTime.now();
         int milliSecond = time.getNano() / 1000000;
         int second = time.getSecond();
-        double length = -6.0 * (second + milliSecond / 1000.0);
+        //double length = -6.0 * (second + milliSecond / 1000.0);
+        double length = -6.0 * (second);        
         arc.setLength(length);
     }
     

@@ -50,16 +50,16 @@ public class DigitalWatch extends Application {
     private static final Color MINUTE_ARC_COLOR = Color.BLUE;
     private static final Color HOUR_ARC_COLOR = Color.RED;
     
-    private Group root = new Group();
-    private Scene scene = new Scene(root, 400, 400);
+    private final Group root = new Group();
+    private final Scene scene = new Scene(root, 400, 400);
     private Stage stage;
 
     private final ArcAdjuster secondAdjuster = new SecondArcAdjuster();
     private final ArcAdjuster minuteAdjuster = new MinuteArcAdjuster();
     private final ArcAdjuster hourAdjuster = new HourArcAdjuster();
-    private Arc secondArc = generateArc(10, SECOND_ARC_COLOR, root);
-    private Arc minuteArc = generateArc(10, MINUTE_ARC_COLOR, root);
-    private Arc hourArc = generateArc(10, HOUR_ARC_COLOR, root);
+    private final Arc secondArc = generateArc(ARC_STROKE_WIDTH, SECOND_ARC_COLOR, root);
+    private final Arc minuteArc = generateArc(ARC_STROKE_WIDTH, MINUTE_ARC_COLOR, root);
+    private final Arc hourArc = generateArc(ARC_STROKE_WIDTH, HOUR_ARC_COLOR, root);
 
     private Canvas canvas;
     private GraphicsContext gc;
