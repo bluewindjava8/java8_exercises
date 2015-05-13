@@ -29,6 +29,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SeparatorMenuItem;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -282,6 +283,7 @@ public class DigitalWatch extends Application {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         //gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
         gc.fillText(timeStr, secondArc.getCenterX() - textWidth / 2, secondArc.getCenterY());
+        gc.applyEffect(new DropShadow(10, 20, 20, (Color)gc.getFill()));
     }
 
     private void saveWatchPreferences() {
