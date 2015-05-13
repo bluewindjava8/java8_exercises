@@ -75,15 +75,6 @@ public class DigitalWatch extends Application {
 
     @Override
     public void stop() throws Exception {
-//        System.out.println("Stage is stopping");
-//        Font font = gc.getFont();
-//        watchPref.putFont(font);
-//        watchPref.putFontColor((Color) gc.getFill());
-//        watchPref.putBackgroundColor((Color) scene.getFill());
-//        //Point winPos = new Point(scene.getX(), scene.getY());
-//        Point leftUpCorner = new Point(stage.getX(), stage.getY());
-//        watchPref.putPos(leftUpCorner);
-
         saveWatchPreferences();
         super.stop();
 
@@ -92,23 +83,8 @@ public class DigitalWatch extends Application {
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
-        //root = new Group();
-        //scene = new Scene(root, 400, 400, Color.BLACK);
         scene.setOnMouseClicked(event -> System.out.println("X = " + event.getX() + ", Y = " + event.getY()));
         stage.initStyle(StageStyle.UNDECORATED);
-        //stage.setFullScreen(true);
-        //stage.initOwner(null);
-        stage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
-            @Override
-            public void changed(ObservableValue<? extends Boolean> prop, Boolean wasIconified, Boolean isIconified) {
-                System.out.println("iiiiiiiiiiiiiignore fullscreen");
-                //stage.setFullScreen(false);
-            }
-        });
-
-//        secondArc = generateArc(10, Color.BLACK, root);
-//        minuteArc = generateArc(10, Color.BLUE, root);
-//        hourArc = generateArc(10, Color.RED, root);
         
 
         Line line = new Line();
@@ -217,28 +193,23 @@ public class DigitalWatch extends Application {
 
         menuBar.getMenus().add(fileMenu);
 
-        menuBar.setOnMousePressed(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                xOffset = primaryStage.getX() - event.getScreenX();
-                yOffset = primaryStage.getY() - event.getScreenY();
-            }
+        menuBar.setOnMousePressed((MouseEvent event) -> {
+            xOffset = primaryStage.getX() - event.getScreenX();
+            yOffset = primaryStage.getY() - event.getScreenY();
         });
         
-        menuBar.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                primaryStage.setX(event.getScreenX() + xOffset);
-                primaryStage.setY(event.getScreenY() + yOffset);
-            }
+        menuBar.setOnMouseDragged((MouseEvent event) -> {
+            primaryStage.setX(event.getScreenX() + xOffset);
+            primaryStage.setY(event.getScreenY() + yOffset);
         });
     }
 
     private void selectFont() {
         Optional<Font> response = Dialogs.create()
                 .masthead("Choose what you like")
-                .showFontSelector(Font.font("Times New Roman"));
-
+                //.showFontSelector(Font.font("Times New Roman"));
+                .showFontSelector(gc.getFont());
+        
         response.ifPresent(font -> {
             System.out.println("font changed.");
             gc.setFont(font);
@@ -249,7 +220,7 @@ public class DigitalWatch extends Application {
     }
 
     private void selectColor() {
-        Dialog colorDialog = new ColorSelectDialog();
+        Dialog colorDialog = new ColorSelectDialog((Color)gc.getFill(), (Color)scene.getFill());
         colorDialog.initOwner(stage);
         Optional<Colors> colorsOptional = colorDialog.showAndWait();
         colorsOptional.ifPresent(colors -> {
@@ -277,8 +248,6 @@ public class DigitalWatch extends Application {
         secondAdjuster.adjustArcByCurrentTime(secondArc);
         minuteAdjuster.adjustArcByCurrentTime(minuteArc);
         hourAdjuster.adjustArcByCurrentTime(hourArc);
-        
-        //secondArc.setEffect(new DropShadow(10, 20, 20, (Color)gc.getFill()));
     }
 
     private void drawTimeStr() {

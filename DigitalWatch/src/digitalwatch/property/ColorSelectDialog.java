@@ -9,10 +9,11 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 
 public class ColorSelectDialog extends Dialog<Colors> {
 
-    public ColorSelectDialog() {
+    public ColorSelectDialog(Color initFontColor, Color initBackgroundColor) {
         setTitle("Color Select Dialog");
         setHeaderText("Set font color and background color.");
 
@@ -28,8 +29,8 @@ public class ColorSelectDialog extends Dialog<Colors> {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 150, 10, 10));
 
-        final ColorPicker fontColorPicker = new ColorPicker();
-        final ColorPicker backgroundColorPicker = new ColorPicker();
+        final ColorPicker fontColorPicker = new ColorPicker(initFontColor);
+        final ColorPicker backgroundColorPicker = new ColorPicker(initBackgroundColor);
 
         Label fontColorLabel = new Label("Font Color:");
         Label backgroundColorLabel = new Label("Background Color:");
