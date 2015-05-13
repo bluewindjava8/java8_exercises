@@ -46,16 +46,20 @@ public class DigitalWatch extends Application {
 
     private static final int MENU_BAR_HEIGHT = 30;
     private static final int ARC_STROKE_WIDTH = 10;
+    private static final Color SECOND_ARC_COLOR = Color.BLACK;
+    private static final Color MINUTE_ARC_COLOR = Color.BLUE;
+    private static final Color HOUR_ARC_COLOR = Color.RED;
+    
     private Group root = new Group();
     private Scene scene = new Scene(root, 400, 400);
     private Stage stage;
 
-    private ArcAdjuster secondAdjuster = new SecondArcAdjuster();
-    private ArcAdjuster minuteAdjuster = new MinuteArcAdjuster();
-    private ArcAdjuster hourAdjuster = new HourArcAdjuster();
-    private Arc secondArc = generateArc(10, Color.BLACK, root);
-    private Arc minuteArc = generateArc(10, Color.BLUE, root);
-    private Arc hourArc = generateArc(10, Color.RED, root);
+    private final ArcAdjuster secondAdjuster = new SecondArcAdjuster();
+    private final ArcAdjuster minuteAdjuster = new MinuteArcAdjuster();
+    private final ArcAdjuster hourAdjuster = new HourArcAdjuster();
+    private Arc secondArc = generateArc(10, SECOND_ARC_COLOR, root);
+    private Arc minuteArc = generateArc(10, MINUTE_ARC_COLOR, root);
+    private Arc hourArc = generateArc(10, HOUR_ARC_COLOR, root);
 
     private Canvas canvas;
     private GraphicsContext gc;
@@ -88,8 +92,8 @@ public class DigitalWatch extends Application {
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
-        root = new Group();
-        scene = new Scene(root, 400, 400, Color.BLACK);
+        //root = new Group();
+        //scene = new Scene(root, 400, 400, Color.BLACK);
         scene.setOnMouseClicked(event -> System.out.println("X = " + event.getX() + ", Y = " + event.getY()));
         stage.initStyle(StageStyle.UNDECORATED);
         //stage.setFullScreen(true);
@@ -102,9 +106,10 @@ public class DigitalWatch extends Application {
             }
         });
 
-        secondArc = generateArc(10, Color.BLACK, root);
-        minuteArc = generateArc(10, Color.BLUE, root);
-        hourArc = generateArc(10, Color.RED, root);
+//        secondArc = generateArc(10, Color.BLACK, root);
+//        minuteArc = generateArc(10, Color.BLUE, root);
+//        hourArc = generateArc(10, Color.RED, root);
+        
 
         Line line = new Line();
         line.startXProperty().set(0);
@@ -161,7 +166,8 @@ public class DigitalWatch extends Application {
         arc.setType(ArcType.OPEN);
         arc.setFill(null);
         arc.setStroke(strokeColor);
-        arc.setStrokeWidth(1);
+        arc.setStrokeWidth(strokeWith);
+        arc.setEffect(new DropShadow(20, 0, 0, strokeColor));
         root.getChildren().add(arc);
 
         return arc;
@@ -271,6 +277,8 @@ public class DigitalWatch extends Application {
         secondAdjuster.adjustArcByCurrentTime(secondArc);
         minuteAdjuster.adjustArcByCurrentTime(minuteArc);
         hourAdjuster.adjustArcByCurrentTime(hourArc);
+        
+        //secondArc.setEffect(new DropShadow(10, 20, 20, (Color)gc.getFill()));
     }
 
     private void drawTimeStr() {
