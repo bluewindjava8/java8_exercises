@@ -8,6 +8,9 @@ import digitalwatch.prefs.Point;
 import digitalwatch.prefs.WatchPreferences;
 import digitalwatch.property.ColorSelectDialog;
 import digitalwatch.property.Colors;
+import digitalwatch.timesource.RealTimeSource;
+import digitalwatch.timesource.TimeSource;
+import digitalwatch.timesource.VirtualTimeSource;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -49,23 +52,29 @@ public class DigitalWatch extends Application {
     private static final Color SECOND_ARC_COLOR = Color.BLACK;
     private static final Color MINUTE_ARC_COLOR = Color.BLUE;
     private static final Color HOUR_ARC_COLOR = Color.RED;
-    
+
     private final Group root = new Group();
     private final Scene scene = new Scene(root, 400, 400);
     private Stage stage;
 
-    private final ArcAdjuster secondAdjuster = new SecondArcAdjuster();
-    private final ArcAdjuster minuteAdjuster = new MinuteArcAdjuster();
-    private final ArcAdjuster hourAdjuster = new HourArcAdjuster();
-    private final Arc secondArc = generateArc(ARC_STROKE_WIDTH, SECOND_ARC_COLOR, root);
-    private final Arc minuteArc = generateArc(ARC_STROKE_WIDTH, MINUTE_ARC_COLOR, root);
-    private final Arc hourArc = generateArc(ARC_STROKE_WIDTH, HOUR_ARC_COLOR, root);
+    private final TimeSource timeSource = new VirtualTimeSource();
 
-    private Canvas canvas;
-    private GraphicsContext gc;
+    private final ArcAdjuster secondAdjuster = new SecondArcAdjuster(timeSource);
+    private final ArcAdjuster minuteAdjuster = new MinuteArcAdjuster(timeSource);
+    private final ArcAdjuster hourAdjuster = new HourArcAdjuster(timeSource);
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-    WatchPreferences watchPref = new WatchPreferences();
+//    private final Arc secondArc = generateArc(ARC_STROKE_WIDTH, SECOND_ARC_COLOR, root);
+//    private final Arc minuteArc = generateArc(ARC_STROKE_WIDTH, MINUTE_ARC_COLOR, root);
+//    private final Arc hourArc = generateArc(ARC_STROKE_WIDTH, HOUR_ARC_COLOR, root);
+    private final TimeArc secondArc = new TimeArc(ARC_STROKE_WIDTH, SECOND_ARC_COLOR);
+    private final TimeArc minuteArc = new TimeArc(ARC_STROKE_WIDTH, MINUTE_ARC_COLOR);
+    private final TimeArc hourArc = new TimeArc(ARC_STROKE_WIDTH, HOUR_ARC_COLOR);
+
+    private final Canvas canvas = generateCanvas();
+    private final GraphicsContext gc = canvas.getGraphicsContext2D();
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private final WatchPreferences watchPref = new WatchPreferences();
 
     @Override
     public void init() throws Exception {
@@ -83,9 +92,25 @@ public class DigitalWatch extends Application {
     @Override
     public void start(Stage primaryStage) {
         stage = primaryStage;
-        scene.setOnMouseClicked(event -> System.out.println("X = " + event.getX() + ", Y = " + event.getY()));
+        //scene.setOnMouseClicked(event -> System.out.println("X = " + event.getX() + ", Y = " + event.getY()));
         stage.initStyle(StageStyle.UNDECORATED);
-        
+
+        root.getChildren().addAll(canvas, secondArc, minuteArc, hourArc);
+
+        Runnable dragEndHandler = () -> {
+            System.out.println("secondArc.length = " + -secondArc.getLength());
+            System.out.println("minuteArc.length = " + -minuteArc.getLength());
+            System.out.println("hourArc.length = " + -hourArc.getLength());
+            
+            LocalTime newTime = TimeArc.toTime(-hourArc.getLength(), -minuteArc.getLength(), -secondArc.getLength(),timeSource);
+            System.out.println("newTime = " + formatter.format(newTime));
+            timeSource.setCurrentTime(newTime);
+            System.out.println("after set = " + formatter.format(timeSource.getCurrentTime()));
+            
+        };
+        secondArc.setDragEndHanlder(dragEndHandler);
+        minuteArc.setDragEndHanlder(dragEndHandler);
+        hourArc.setDragEndHanlder(dragEndHandler);
 
         Line line = new Line();
         line.startXProperty().set(0);
@@ -101,13 +126,15 @@ public class DigitalWatch extends Application {
         vline.endXProperty().bind(secondArc.centerXProperty());
         root.getChildren().add(vline);
 
-        canvas = new Canvas(400, 400);
-        gc = canvas.getGraphicsContext2D();
-
-        canvas.widthProperty().bind(scene.widthProperty());
-        canvas.heightProperty().bind(scene.heightProperty());
-        root.getChildren().add(canvas);
-
+//        canvas = new Canvas(400, 400);
+//        gc = canvas.getGraphicsContext2D();
+//
+//        canvas.widthProperty().bind(scene.widthProperty());
+//        canvas.heightProperty().bind(scene.heightProperty());
+//        root.getChildren().add(canvas);
+//        canvas.setOnMouseClicked(event -> {
+//            System.out.println("cavas mouse clicked.");
+//        });
         bindComponents();
         createMenu(primaryStage);
 
@@ -144,8 +171,21 @@ public class DigitalWatch extends Application {
         arc.setStroke(strokeColor);
         arc.setStrokeWidth(strokeWith);
         arc.setEffect(new DropShadow(20, 0, 0, strokeColor));
-        root.getChildren().add(arc);
+        //root.getChildren().add(arc);
 
+        arc.setOnMouseDragged(event -> {
+            double theta = Math.toDegrees(Math.atan2(arc.getCenterY() - event.getY(), event.getX() - arc.getCenterX()));
+
+            double arcLength = theta - 90;
+            arcLength = arcLength < 0 ? arcLength : arcLength - 360;
+            arc.setLength(arcLength);
+            System.out.println("event.getY() = " + event.getY() + ", centery = " + arc.getCenterY() + "event.getX() = " + event.getX() + ", centerX = " + arc.getCenterX());
+            System.out.println("nnnnnnnnnnnnnn theat = " + theta + ", arcLength = " + arcLength);
+        });
+
+        arc.setOnMouseClicked(event -> {
+            System.out.println("second arc mouse clicked  x = " + event.getX());
+        });
         return arc;
     }
 
@@ -197,11 +237,23 @@ public class DigitalWatch extends Application {
             xOffset = primaryStage.getX() - event.getScreenX();
             yOffset = primaryStage.getY() - event.getScreenY();
         });
-        
+
         menuBar.setOnMouseDragged((MouseEvent event) -> {
             primaryStage.setX(event.getScreenX() + xOffset);
             primaryStage.setY(event.getScreenY() + yOffset);
         });
+    }
+
+    private Canvas generateCanvas() {
+        Canvas canvas = new Canvas(400, 400);
+
+        canvas.widthProperty().bind(scene.widthProperty());
+        canvas.heightProperty().bind(scene.heightProperty());
+        canvas.setOnMouseClicked(event -> {
+            System.out.println("cavas mouse clicked.");
+        });
+
+        return canvas;
     }
 
     private void selectFont() {
@@ -209,7 +261,7 @@ public class DigitalWatch extends Application {
                 .masthead("Choose what you like")
                 //.showFontSelector(Font.font("Times New Roman"));
                 .showFontSelector(gc.getFont());
-        
+
         response.ifPresent(font -> {
             System.out.println("font changed.");
             gc.setFont(font);
@@ -220,7 +272,7 @@ public class DigitalWatch extends Application {
     }
 
     private void selectColor() {
-        Dialog colorDialog = new ColorSelectDialog((Color)gc.getFill(), (Color)scene.getFill());
+        Dialog colorDialog = new ColorSelectDialog((Color) gc.getFill(), (Color) scene.getFill());
         colorDialog.initOwner(stage);
         Optional<Colors> colorsOptional = colorDialog.showAndWait();
         colorsOptional.ifPresent(colors -> {
@@ -238,16 +290,26 @@ public class DigitalWatch extends Application {
         text.setFont(gc.getFont());
         double textWidth = text.getLayoutBounds().getWidth();
         double newWidth = (textWidth + 15) * 1.3 * 1.7 + MENU_BAR_HEIGHT;
+
         stage.setWidth(newWidth);
         stage.setHeight(newWidth);
         stage.hide();
         stage.show();
+
     }
 
     private void drawArcs() {
-        secondAdjuster.adjustArcByCurrentTime(secondArc);
-        minuteAdjuster.adjustArcByCurrentTime(minuteArc);
-        hourAdjuster.adjustArcByCurrentTime(hourArc);
+        if (!secondArc.isDragging()) {
+            secondAdjuster.adjustArcByCurrentTime(secondArc);
+        }
+
+        if (!minuteArc.isDragging()) {
+            minuteAdjuster.adjustArcByCurrentTime(minuteArc);
+        }
+
+        if (!hourArc.isDragging()) {
+            hourAdjuster.adjustArcByCurrentTime(hourArc);
+        }
     }
 
     private void drawTimeStr() {
@@ -255,12 +317,13 @@ public class DigitalWatch extends Application {
         text.setFont(gc.getFont());
         double textWidth = text.getLayoutBounds().getWidth();
 
-        LocalTime now = LocalTime.now();
+        //LocalTime now = LocalTime.now();
+        LocalTime now = timeSource.getCurrentTime();
         String timeStr = formatter.format(now);
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         //gc.clearRect(0, 0, stage.getWidth(), stage.getHeight());
         gc.fillText(timeStr, secondArc.getCenterX() - textWidth / 2, secondArc.getCenterY());
-        gc.applyEffect(new DropShadow(10, 20, 20, (Color)gc.getFill()));
+        gc.applyEffect(new DropShadow(10, 20, 20, (Color) gc.getFill()));
     }
 
     private void saveWatchPreferences() {
