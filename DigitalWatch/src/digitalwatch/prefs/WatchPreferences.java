@@ -8,19 +8,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class WatchPreferences {
+
     private static final String NODE_PATH = WatchPreferences.class.getCanonicalName();
 
     Preferences prefsRoot = Preferences.userRoot();
     Preferences prefs = prefsRoot.node(NODE_PATH);
 
-    public void clear(){
+    public void clear() {
         try {
             prefs.clear();
         } catch (BackingStoreException ex) {
             Logger.getLogger(WatchPreferences.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     public void putFont(Font font) {
         prefs.put("fontName", font.getName());
         prefs.put("fontStyle", font.getStyle());
@@ -86,10 +87,31 @@ public class WatchPreferences {
 
         return Color.color(red, green, blue);
     }
-    
-    public void putPos(Point point){
+
+    public void putPos(Point point) {
         prefs.putDouble("X", point.getX());
-          prefs.putDouble("Y", point.getY());      
+        prefs.putDouble("Y", point.getY());
+        try {
+            //prefs.flush();
+            prefs.sync();
+        } catch (BackingStoreException ex) {
+            Logger.getLogger(WatchPreferences.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public Point getPos(Point defaultPoint) {
+        double x = prefs.getDouble("X", -1);
+        double y = prefs.getDouble("Y", -1);
+
+        if (x < 0 || y < 0) {
+            return defaultPoint;
+        }
+
+        return new Point(x, y);
+    }
+
+    public void putTimeDiff(long diff) {
+        prefs.putLong("timeDiff", diff);
         try {
             //prefs.flush();
             prefs.sync();
@@ -98,18 +120,12 @@ public class WatchPreferences {
         }
     }
     
-    public Point getPos(Point defaultPoint){
-        double x = prefs.getDouble("X", -1);
-        double y = prefs.getDouble("Y", -1);
-        
-        if(x < 0 || y < 0){
-            return defaultPoint;
-        }
-        
-        return new Point(x, y);
+    public long getTimeDiff(int defaultTimeDiff){
+        long timeDiff = prefs.getLong("timeDiff", defaultTimeDiff);
+        return timeDiff;
     }
 
-    public String getAbsolutePath(){
+    public String getAbsolutePath() {
         return prefs.absolutePath();
     }
 }

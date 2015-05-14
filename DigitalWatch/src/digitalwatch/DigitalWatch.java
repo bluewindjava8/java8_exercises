@@ -333,6 +333,7 @@ public class DigitalWatch extends Application {
         watchPref.putBackgroundColor((Color) scene.getFill());
         Point leftUpCorner = new Point(stage.getX(), stage.getY());
         watchPref.putPos(leftUpCorner);
+        watchPref.putTimeDiff(java.time.Duration.between(LocalTime.now(), timeSource.getCurrentTime()).getSeconds());
     }
 
     private void restoreWatchPreferences() {
@@ -345,6 +346,10 @@ public class DigitalWatch extends Application {
         stage.setY(leftUpCorner.getY());
 
         resizeSceneByFont();
+        
+        long timeDiff = watchPref.getTimeDiff(0);
+        LocalTime currentTime = LocalTime.now().plus(java.time.Duration.ofSeconds(timeDiff));
+        timeSource.setCurrentTime(currentTime);
     }
 
     public static void main(String[] args) {
