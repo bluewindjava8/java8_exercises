@@ -76,6 +76,8 @@ public class DigitalWatch extends Application {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
     private final WatchPreferences watchPref = new WatchPreferences();
 
+    private boolean resetFlag = false;
+    
     @Override
     public void init() throws Exception {
         super.init();
@@ -84,7 +86,11 @@ public class DigitalWatch extends Application {
 
     @Override
     public void stop() throws Exception {
-        saveWatchPreferences();
+        if(!resetFlag){
+            saveWatchPreferences();
+        }else{
+            watchPref.clear();
+        }
         super.stop();
 
     }
@@ -222,14 +228,16 @@ public class DigitalWatch extends Application {
         Menu fileMenu = new Menu("File");
         MenuItem fontSelectMenuItem = new MenuItem("Font Select");
         MenuItem colorSelectMenuItem = new MenuItem("Color Select");
-        MenuItem exitMenuItem = new MenuItem("Exit");
+        MenuItem clearPreferenceMenuItem = new MenuItem("Clear Preference And Exit");
+        MenuItem exitMenuItem = new MenuItem("Save Preference And Exit");
 
         fontSelectMenuItem.setOnAction(actionEvent -> selectFont());
         colorSelectMenuItem.setOnAction(actionEvent -> selectColor());
+        clearPreferenceMenuItem.setOnAction(actionEvent -> reset());
         exitMenuItem.setOnAction(actionEvent -> Platform.exit());
 
-        fileMenu.getItems().addAll(fontSelectMenuItem, colorSelectMenuItem,
-                new SeparatorMenuItem(), exitMenuItem);
+        fileMenu.getItems().addAll(fontSelectMenuItem, colorSelectMenuItem, 
+                new SeparatorMenuItem(), clearPreferenceMenuItem, exitMenuItem);
 
         menuBar.getMenus().add(fileMenu);
 
@@ -284,6 +292,11 @@ public class DigitalWatch extends Application {
             scene.setFill(colors.getBackgroundColor());
         });
     }
+    
+    private void reset(){
+        resetFlag = true;
+        Platform.exit();
+    }
 
     private void resizeSceneByFont() {
         Text text = new Text("00:00:00");
@@ -330,25 +343,32 @@ public class DigitalWatch extends Application {
         Font font = gc.getFont();
         watchPref.putFont(font);
         watchPref.putFontColor((Color) gc.getFill());
+        System.out.println("background color = " + (Color) scene.getFill());
         watchPref.putBackgroundColor((Color) scene.getFill());
         Point leftUpCorner = new Point(stage.getX(), stage.getY());
         watchPref.putPos(leftUpCorner);
-        watchPref.putTimeDiff(java.time.Duration.between(LocalTime.now(), timeSource.getCurrentTime()).getSeconds());
+        LocalTime realTime = LocalTime.now();
+        LocalTime virtualTime = timeSource.getCurrentTime();
+        System.out.println("realTime : " + formatter.format(realTime) + ",   " + realTime);
+        System.out.println("virtualTime :" + formatter.format(virtualTime)+ ",   " + virtualTime);
+        
+        watchPref.putTimeDiff(java.time.Duration.between(realTime, virtualTime).toNanos());
     }
 
     private void restoreWatchPreferences() {
         gc.setFont(watchPref.getFont(gc.getFont()));
         gc.setFill(watchPref.getFontColor(Color.BLACK));
-        scene.setFill(watchPref.getBackgroundColor(Color.TRANSPARENT));
+        System.out.println("restore background color = " + watchPref.getBackgroundColor(Color.TRANSPARENT));
+        scene.setFill(watchPref.getBackgroundColor(Color.WHITE));
 
-        Point leftUpCorner = watchPref.getPos(new Point(stage.getX(), stage.getY()));
+        Point leftUpCorner = watchPref.getPos(new Point(100, 100));
         stage.setX(leftUpCorner.getX());
         stage.setY(leftUpCorner.getY());
 
         resizeSceneByFont();
         
-        long timeDiff = watchPref.getTimeDiff(0);
-        LocalTime currentTime = LocalTime.now().plus(java.time.Duration.ofSeconds(timeDiff));
+        long timeDiffInNano = watchPref.getTimeDiff(0);
+        LocalTime currentTime = LocalTime.now().plus(java.time.Duration.ofNanos(timeDiffInNano));
         timeSource.setCurrentTime(currentTime);
     }
 
